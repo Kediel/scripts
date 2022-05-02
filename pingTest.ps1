@@ -13,21 +13,25 @@ $sheet = $WorkBook.Worksheets.Item($sheetName)
  $objExcel.DisplayAlerts = $false
 
 $rowMax = $sheet.usedRange.Rows.Count
+$success = 0
+$failed = 0
 
 try{
     
     for ($i=2; $i -le $rowMax; $i++){
     
         $hosts = $objExcel.Columns.Item(1).Rows.Item($i).Text
-        Write-Host "Pinging: $hosts" # Prints output
+        Write-Host "Pinging(Host #$i): $hosts" # Prints output
          
         if ( Test-Connection $hosts -Count 2 -Delay 1 -Quiet ) {
                 
-                    Write-Host "$hosts - Success"
-            
+                Write-Host "$hosts - Success"
+                $success++
+                
             } else {
                 
                 Write-Host "$hosts - Failed"
+                $failed++
             }
      }
 } catch {
@@ -51,5 +55,7 @@ try{
                 Write-Verbose "Finish writing to Error log."
             } #>
 }
+
+Write-Host "In total there were $success successful and $failed failed pings."
 
 $objExcel.quit()
